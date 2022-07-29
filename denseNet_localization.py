@@ -44,6 +44,7 @@ test_X = []
 print("load and transform image")
 for i in range(len(test_list)):
     image_path = os.path.join(img_folder_path, test_list[i])
+    print(f"image_path: {image_path}")
     img = scipy.misc.imread(image_path)
     if img.shape != (1024,1024):
         img = img[:,:,0]
@@ -75,7 +76,7 @@ class DenseNet121(nn.Module):
 
 model = DenseNet121(8).cuda()
 model = torch.nn.DataParallel(model)
-model.load_state_dict(torch.load("model/DenseNet121_aug4_pretrain_WeightBelow1_1_0.829766922537.pkl"))
+state_dict = torch.load("model/DenseNet121_aug4_pretrain_WeightBelow1_1_0.829766922537.pkl")
 print("model loaded")
 
 
@@ -169,7 +170,7 @@ class GradCAM(PropagationBase):
 
     def _normalize(self, grads):
         l2_norm = torch.sqrt(torch.mean(torch.pow(grads, 2))) + 1e-5
-        return grads / l2_norm.data[0]
+        return grads / l2_norm.data
 
     def _compute_grad_weights(self, grads):
         grads = self._normalize(grads)
@@ -216,7 +217,7 @@ for index in range(len(test_dataset)):
     activate_classes = np.where((probs > thresholds)[0]==True)[0] # get the activated class
     for activate_class in activate_classes:
         gcam.backward(idx=activate_class)
-        output = gcam.generate(target_layer="module.densenet121.features.denseblock4.denselayer16.conv.2")
+        output = gcam.generate(target_layer="module.densenet121.features.denseblock4.denselayer16.conv2")
         #### this output is heatmap ####
         if np.sum(np.isnan(output)) > 0:
             print("fxxx nan")

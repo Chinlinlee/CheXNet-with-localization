@@ -11,8 +11,24 @@ In this task, we have to plot bounding boxes for each disease finding in a singl
 1) Predict findings
 2) Use the classifier to plot heatmap (Grad-CAM)
 3) Plot the bounding box base on Grad-CAM
+
 ### Package : 
-`Pytorch==0.2.0` &nbsp; `torchvision==0.2.0` &nbsp;` matplotlib`  &nbsp;` scikit-image==0.13.1` &nbsp;` opencv_python==3.4.0.12` &nbsp;` numpy==1.13.3` &nbsp;`matplotlib==2.1.1` &nbsp;`scipy==1.0.0` &nbsp; `sklearn==0.19.1` &nbsp;
+- Python=3.6
+The package changes that mention from [#8](https://github.com/thtang/CheXNet-with-localization/issues/8)
+- ~~`Pytorch==0.2.0`~~ -> `pytorch==1.0.1`
+```sh
+# please using the anaconda
+conda install pytorch==1.0.1 -c pytorch
+```
+- ~~`torchvision==0.2.0`~~ -> `torchvision==0.2.2`
+- `matplotlib` 
+- `scikit-image==0.13.1` 
+- `opencv_python==3.4.0.12`
+- `numpy==1.13.3` 
+- `matplotlib==2.1.1` 
+- `scipy==1.0.0` 
+- `sklearn==0.19.1` 
+
 
 ### Environment:
 * OS: Linux
@@ -58,6 +74,21 @@ python3 inference.py
 
 5) For **visualization**, please refers to [issue](https://github.com/thtang/CheXNet-with-localization/issues/9). Credit to [Sadam1195](https://github.com/Sadam1195).
 
+### Get bounding box from trained model
+From: [#7](https://github.com/thtang/CheXNet-with-localization/issues/7)
+- Using the `denseNet_localization.py` in root path
+```sh
+python3 denseNet_localization.py [path to test.txt] [path of images folder]
+```
+- Where `test.txt` structure below; list the image filename that you want to get bounding box
+```txt
+xxx.jpg
+uuu.jpg
+yyy.jpg
+```
+- Where `path of images folder` is the image files' folder, e.g. /mnt/d/images
+- The code will process the every line in test.txt and combine the images folder like `/mnt/d/images/xxx.jpg`
+- Result's structure will be `{pathologies} x1 y1 x2 y2`
 ### Note :
 In our .py script, I used the following script to assign the task running on GPU 0.<br>
 

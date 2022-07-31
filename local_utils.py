@@ -88,7 +88,7 @@ def convert_dicom_to_jpeg(full_dcm_filename, ds):
 pass
 
 
-def create_gsps_from_bounding_box(ds: pydicom.Dataset, prediction: str, index: int):
+def create_gsps_from_bounding_box(ds: pydicom.Dataset, prediction: str, index: int, img_folder_path: str):
     original_width = ds.Columns
     original_height = ds.Rows
     scale_width = original_width / 1024
@@ -180,7 +180,7 @@ def create_gsps_from_bounding_box(ds: pydicom.Dataset, prediction: str, index: i
     )
 
     # Save the GSPS file
-    gsps.save_as(f"gsps_{prediction_name}_{index}.dcm")
+    gsps.save_as(os.path.join(img_folder_path, f"gsps_{prediction_name}_{index}.dcm"))
 
 pass
 

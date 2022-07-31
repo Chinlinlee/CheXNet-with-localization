@@ -312,26 +312,37 @@ with open("bounding_box_prev.txt", "w") as f:
 
         print(os.path.join(img_folder_path, fname), len(prediction))
         f.write('%s %d\n' % (os.path.join(img_folder_path, fname), len(prediction)))
-        frame = cv2.imread(image_path)
+
         for index, p in enumerate(prediction):
             print(p)
             f.write(p + "\n")
             if test_list_is_dcm[i]:
-                local_utils.create_gsps_from_bounding_box(ds, p, index+1)
-            prediction_name, temp_x1, temp_y1, temp_x2, temp_y2 = p.split(" ")
-            if temp_x1 < temp_x2:
-                x1, y1, x2, y2 = [np.round(float(temp_x1)),
-                                  np.round(float(temp_y1)),
-                                  np.round(float(temp_x2)),
-                                  np.round(float(temp_y2))]
+                local_utils.create_gsps_from_bounding_box(ds, p, index+1, img_folder_path)
+            pass
+        pass
+    pass
 
-            else:
-                x1, y1, x2, y2 = [np.round(float(temp_x2)),
-                                  np.round(float(temp_y2)),
-                                  np.round(float(temp_x1)),
-                                  np.round(float(temp_y1))]
-            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 3)  # rgb 220,20,60
-            cv2.imshow('image', frame)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+
+pass
+
+
+def visualize_prediction_image(p):
+    frame = cv2.imread(image_path)
+    prediction_name, temp_x1, temp_y1, temp_x2, temp_y2 = p.split(" ")
+    if temp_x1 < temp_x2:
+        x1, y1, x2, y2 = [np.round(float(temp_x1)),
+                          np.round(float(temp_y1)),
+                          np.round(float(temp_x2)),
+                          np.round(float(temp_y2))]
+
+    else:
+        x1, y1, x2, y2 = [np.round(float(temp_x2)),
+                          np.round(float(temp_y2)),
+                          np.round(float(temp_x1)),
+                          np.round(float(temp_y1))]
+    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 3)  # rgb 220,20,60
+    cv2.imshow('image', frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+pass
 

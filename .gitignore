@@ -2,3 +2,4 @@
 
 # ignore pycharm configuration files
 /.idea
+/**/__pycache__

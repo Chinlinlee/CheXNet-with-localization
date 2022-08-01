@@ -14,6 +14,8 @@ import torchvision
 from pydicom.valuerep import PersonName
 
 
+# model archi
+# construct model
 class DenseNet121(nn.Module, ABC):
     """Model modified.
     The architecture of our model is the same as standard DenseNet121
@@ -28,6 +30,12 @@ class DenseNet121(nn.Module, ABC):
             nn.Linear(num_ftrs, out_size),
             nn.Sigmoid()
         )
+
+    pass
+
+    def forward(self, x):
+        x = self.densenet121(x)
+        return x
 
     pass
 
@@ -133,7 +141,7 @@ def create_gsps_from_bounding_box(ds: pydicom.Dataset, prediction: str, index: i
     text = highdicom.pr.TextObject(
         text_value=prediction_name,
         bounding_box=np.array(
-            [np.round(x1), np.round(y1), np.round(x1+10), np.round(y1+20)]  # left, top, right, bottom
+            [np.round(x1), np.round(y1), np.round(x1 + 10), np.round(y1 + 20)]  # left, top, right, bottom
         ),
         units=highdicom.pr.AnnotationUnitsValues.PIXEL,  # units for bounding box
         tracking_id=f"{prediction_name}_text",  # site-specific ID
@@ -181,6 +189,7 @@ def create_gsps_from_bounding_box(ds: pydicom.Dataset, prediction: str, index: i
 
     # Save the GSPS file
     gsps.save_as(os.path.join(img_folder_path, f"gsps_{prediction_name}_{index}.dcm"))
+
 
 pass
 

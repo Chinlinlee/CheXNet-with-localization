@@ -81,7 +81,7 @@ def convert_dicom_to_jpeg(full_dcm_filename, ds):
     image_data = dicom_color_correction(ds, image_data)
 
     image_quality = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-    cv2.imwirte(full_jpeg_filename, image_data, image_quality)
+    cv2.imwrite(full_jpeg_filename, image_data, image_quality)
     return True
 
 

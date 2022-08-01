@@ -1,42 +1,29 @@
 import numpy as np
-from os import listdir
-import skimage.transform
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from torch.nn import functional as F
 import torch.nn as nn
-import torch.backends.cudnn as cudnn
-import torchvision
+
 import torchvision.transforms as transforms
 from torch.autograd import Variable
-import torch.optim as optim
-from torch.autograd import Function
-from torchvision import models
-from torchvision import utils
+
 import cv2
 import sys
 import os
-import pickle
-from collections import defaultdict
+
 from collections import OrderedDict
-
-import skimage
-from skimage.io import *
-from skimage.transform import *
-
-import scipy
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 from scipy.ndimage import binary_dilation
-import matplotlib.patches as patches
 import local_utils
+from local_utils import DenseNet121
 import pydicom
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 test_txt_path = sys.argv[1]
 img_folder_path = sys.argv[2]
-test_list_ds = [] # Temp DICOM dataset
+test_list_ds = []  # Temp DICOM dataset
 test_list_is_dcm = []
 
 with open(test_txt_path, "r") as f:
@@ -61,29 +48,6 @@ for i in range(len(test_list)):
     if i % 100 == 0:
         print(i)
 test_X = np.array(test_X)
-
-
-# model archi
-# construct model
-class DenseNet121(nn.Module):
-    """Model modified.
-	The architecture of our model is the same as standard DenseNet121
-	except the classifier layer which has an additional sigmoid function.
-	"""
-
-    def __init__(self, out_size):
-        super(DenseNet121, self).__init__()
-        self.densenet121 = torchvision.models.densenet121(pretrained=True)
-        num_ftrs = self.densenet121.classifier.in_features
-        self.densenet121.classifier = nn.Sequential(
-            nn.Linear(num_ftrs, out_size),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        x = self.densenet121(x)
-        return x
-
 
 model = DenseNet121(8).cuda()
 model = torch.nn.DataParallel(model)
@@ -150,8 +114,6 @@ class PropagationBase(object):
     def forward(self, image):
         self.image = image
         self.preds = self.model.forward(self.image)
-        #         self.probs = F.softmax(self.preds)[0]
-        #         self.prob, self.idx = self.preds[0].data.sort(0, True)
         return self.preds.cpu().data.numpy()
 
     def backward(self, idx):
@@ -265,7 +227,7 @@ for img_id, k, npy in zip(image_id, output_class, heatmap_output):
 
     # output avgerge
     prediction_sent = '%s %.1f %.1f %.1f %.1f' % (
-    class_index[k], avg_size[k][0], avg_size[k][1], avg_size[k][2], avg_size[k][3])
+        class_index[k], avg_size[k][0], avg_size[k][1], avg_size[k][2], avg_size[k][3])
     prediction_dict[img_id].append(prediction_sent)
 
     if np.isnan(data).any():
@@ -317,11 +279,10 @@ with open("bounding_box_prev.txt", "w") as f:
             print(p)
             f.write(p + "\n")
             if test_list_is_dcm[i]:
-                local_utils.create_gsps_from_bounding_box(ds, p, index+1, img_folder_path)
+                local_utils.create_gsps_from_bounding_box(ds, p, index + 1, img_folder_path)
             pass
         pass
     pass
-
 
 pass
 
@@ -344,5 +305,6 @@ def visualize_prediction_image(p):
     cv2.imshow('image', frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-pass
 
+
+pass

@@ -1,35 +1,23 @@
 import numpy as np
-from os import listdir
-import skimage.transform
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from torch.nn import functional as F
 import torch.nn as nn
-import torch.backends.cudnn as cudnn
-import torchvision
+
 import torchvision.transforms as transforms
 from torch.autograd import Variable
-import torch.optim as optim
-from torch.autograd import Function
-from torchvision import models
-from torchvision import utils
+
 import cv2
 import sys
 import os
-import pickle
-from collections import defaultdict
+
 from collections import OrderedDict
-
-import skimage
-from skimage.io import *
-from skimage.transform import *
-
-import scipy
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 from scipy.ndimage import binary_dilation
-import matplotlib.patches as patches
+
 import local_utils
+from local_utils import DenseNet121
 import pydicom
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
@@ -61,28 +49,6 @@ for i in range(len(test_list)):
     if i % 100 == 0:
         print(i)
 test_X = np.array(test_X)
-
-
-# model archi
-# construct model
-class DenseNet121(nn.Module):
-    """Model modified.
-	The architecture of our model is the same as standard DenseNet121
-	except the classifier layer which has an additional sigmoid function.
-	"""
-
-    def __init__(self, out_size):
-        super(DenseNet121, self).__init__()
-        self.densenet121 = torchvision.models.densenet121(pretrained=True)
-        num_ftrs = self.densenet121.classifier.in_features
-        self.densenet121.classifier = nn.Sequential(
-            nn.Linear(num_ftrs, out_size),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        x = self.densenet121(x)
-        return x
 
 
 model = DenseNet121(8)

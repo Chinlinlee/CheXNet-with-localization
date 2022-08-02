@@ -21,13 +21,20 @@ import pydicom
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
+img_folder_path = ""
 test_txt_path = sys.argv[1]
-img_folder_path = sys.argv[2]
+i_path, i_filename = os.path.split(test_txt_path)
+img_folder_path = sys.argv[2] if len(sys.argv) >= 3 else i_path
 test_list_ds = []  # Temp DICOM dataset
 test_list_is_dcm = []
 
-with open(test_txt_path, "r") as f:
-    test_list = [i.strip() for i in f.readlines()]
+if len(sys.argv) >= 3:
+    with open(test_txt_path, "r") as f:
+        test_list = [i.strip() for i in f.readlines()]
+    pass
+else:
+    test_list = [test_txt_path.strip()]
+pass
 
 print("number of test examples:", len(test_list))
 

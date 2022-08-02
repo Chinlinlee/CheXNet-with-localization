@@ -22,13 +22,20 @@ import pydicom
 
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
+img_folder_path = ""
 test_txt_path = sys.argv[1]
-img_folder_path = sys.argv[2]
-test_list_ds = [] # Temp DICOM dataset
+i_path, i_filename = os.path.split(test_txt_path)
+img_folder_path = sys.argv[2] if len(sys.argv) >= 3 else i_path
+test_list_ds = []  # Temp DICOM dataset
 test_list_is_dcm = []
 
-with open(test_txt_path, "r") as f:
-    test_list = [i.strip() for i in f.readlines()]
+if len(sys.argv) >= 3:
+    with open(test_txt_path, "r") as f:
+        test_list = [i.strip() for i in f.readlines()]
+    pass
+else:
+    test_list = [test_txt_path.strip()]
+pass
 
 print("number of test examples:", len(test_list))
 
@@ -59,8 +66,8 @@ print("model loaded")
 
 # build test dataset
 class ChestXrayDataSet_plot(Dataset):
-    def __init__(self, input_X=test_X, transform=None):
-        self.X = np.uint8(test_X * 255)
+    def __init__(self, input_X, transform=None):
+        self.X = np.uint8(input_X * 255)
         self.transform = transform
 
     def __getitem__(self, index):
@@ -123,7 +130,7 @@ class PropagationBase(object):
     def backward(self, idx):
         self.model.zero_grad()
         one_hot = self._encode_one_hot(idx)
-        self.preds.backward(gradient=one_hot, retain_graph=True)
+        self.preds.cpu().backward(gradient=one_hot, retain_graph=True)
 
 
 class GradCAM(PropagationBase):

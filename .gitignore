@@ -3,3 +3,6 @@
 # ignore pycharm configuration files
 /.idea
 /**/__pycache__
+
+temp/**
+!temp/.gitkeep

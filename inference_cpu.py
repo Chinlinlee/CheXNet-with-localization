@@ -11,10 +11,8 @@ import torchvision.transforms as transforms
 from torch.autograd import Variable
 
 import cv2
-import sys
 import os
 
-from collections import OrderedDict
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 from scipy.ndimage import binary_dilation
@@ -36,6 +34,7 @@ def inference(i_filename: str):
     global ds
     img_folder_path, filename = os.path.split(i_filename)
     test_x = []
+    gsps_dataset_list = []
     extension_name = os.path.splitext(i_filename)[1]
     if extension_name == ".dcm":
         ds = pydicom.dcmread(i_filename, stop_before_pixels=True)
@@ -64,8 +63,11 @@ def inference(i_filename: str):
     heatmap_output, image_id, output_class = create_heatmap(model, test_dataset, thresholds)
     prediction_dict = plot_bounding_box(image_id, output_class, heatmap_output)
     for index, p in enumerate(prediction_dict[0]):
-        local_utils.create_gsps_from_bounding_box(ds, p, index + 1, img_folder_path)
+        gsps_obj = local_utils.create_gsps_from_bounding_box(ds, p, index + 1, img_folder_path)
+        gsps_dataset_list.append(gsps_obj)
     pass
+    return gsps_dataset_list
+
 
 pass
 

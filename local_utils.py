@@ -1,5 +1,6 @@
 import os
 from abc import ABC
+from io import BytesIO
 
 import cv2
 import dicom2jpg
@@ -16,6 +17,7 @@ from torch.autograd import Variable
 import torchvision
 from torch.utils.data import Dataset
 from pydicom.valuerep import PersonName
+from pydicom.filebase import DicomFileLike
 from collections import OrderedDict
 
 
@@ -331,9 +333,33 @@ def create_gsps_from_bounding_box(ds: pydicom.Dataset, prediction: str, index: i
     )
 
     # Save the GSPS file
-    gsps.save_as(os.path.join(img_folder_path, f"gsps_{prediction_name}_{index}.dcm"))
+    instance_uid = ds.SOPInstanceUID
+    output_filename = f"gsps_{prediction_name}_{index}_{instance_uid}.dcm"
+    gsps.save_as(os.path.join(img_folder_path, output_filename))
+    return {
+        "dataset": gsps,
+        "filename": output_filename
+    }
 
 
 pass
+
+
+def write_dataset_to_bytes(dataset):
+    # create a buffer
+    with BytesIO() as buffer:
+        # create a DicomFileLike object that has some properties of DataSet
+        memory_dataset = DicomFileLike(buffer)
+        # write the dataset to the DicomFileLike object
+        pydicom.dcmwrite(memory_dataset, dataset)
+        # to read from the object, you have to rewind it
+        memory_dataset.seek(0)
+        # read the contents as bytes
+        return memory_dataset.read()
+    pass
+
+
+pass
+
 
 # endregion

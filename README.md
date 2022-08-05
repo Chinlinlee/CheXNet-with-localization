@@ -1,4 +1,16 @@
 # CheXNet-with-localization
+
+
+> **Note**
+> The modify code that support input single DICOM and get multiple DICOM GSPS results from bounding box results
+> Add features:
+> - Input single DICOM and output multiple DICOM GSPS results
+> - Extract inference into function that can be reusable (only support CPU mode)
+> - Web API:
+>   - GET: http://aimodel.example.com/ai_exec?filename=/home/user/chest.dcm
+>   - POST: http://aimodel.example.com/ai_exec, body = form data => {file: file}, return zip file
+>   - POST: http://aimodel.example.com/ai_exec_multipart, body = form data => {file: file}, return multipart/related
+
 ADLxMLDS 2017 fall final
 
 Team:XD

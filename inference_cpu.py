@@ -21,6 +21,7 @@ import local_utils
 from local_utils import DenseNet121, ChestXrayDataSetPlot, GradCAM
 import pydicom
 
+CURRENT_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 torch.device('cpu')
 is_dcm = False
 ds = None
@@ -45,7 +46,10 @@ def inference(i_filename: str):
 
     model = DenseNet121(8)
     model = torch.nn.DataParallel(model)
-    state_dict = torch.load("model/DenseNet121_aug4_pretrain_WeightBelow1_1_0.829766922537.pkl")
+    state_dict = torch.load(
+        os.path.join(CURRENT_FILE_PATH, "model/DenseNet121_aug4_pretrain_WeightBelow1_1_0.829766922537.pkl"), 
+        map_location="cpu"
+    )
     print("model loaded")
 
     dataset_transforms = transforms.Compose([
@@ -56,7 +60,9 @@ def inference(i_filename: str):
     ])
     test_dataset = ChestXrayDataSetPlot(input_x=test_x, transform=dataset_transforms)
 
-    thresholds = np.load("thresholds.npy")
+    thresholds = np.load(
+        os.path.join(CURRENT_FILE_PATH, "thresholds.npy")
+    )
     print("activate threshold", thresholds)
 
     print("generate heatmap ..........")

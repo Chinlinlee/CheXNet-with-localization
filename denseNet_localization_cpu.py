@@ -20,7 +20,8 @@ import local_utils
 from local_utils import DenseNet121
 import pydicom
 
-os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+CURRENT_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+os.environ['CUDA_VISIBLE_DEVICES'] = ""
 
 img_folder_path = ""
 test_txt_path = sys.argv[1]
@@ -57,10 +58,16 @@ for i in range(len(test_list)):
         print(i)
 test_X = np.array(test_X)
 
-
 model = DenseNet121(8)
 model = torch.nn.DataParallel(model)
-state_dict = torch.load("model/DenseNet121_aug4_pretrain_WeightBelow1_1_0.829766922537.pkl")
+
+state_dict = torch.load(
+    os.path.join(
+        CURRENT_FILE_PATH,
+        "model/DenseNet121_aug4_pretrain_WeightBelow1_1_0.829766922537.pkl"
+    )
+    , map_location="cpu"
+)
 print("model loaded")
 
 
@@ -92,7 +99,7 @@ test_dataset = ChestXrayDataSet_plot(input_X=test_X, transform=transforms.Compos
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ]))
 
-thresholds = np.load("thresholds.npy")
+thresholds = np.load(os.path.join(CURRENT_FILE_PATH,"thresholds.npy"))
 print("activate threshold", thresholds)
 
 print("generate heatmap ..........")
@@ -238,7 +245,7 @@ for img_id, k, npy in zip(image_id, output_class, heatmap_output):
 
     # output avgerge
     prediction_sent = '%s %.1f %.1f %.1f %.1f' % (
-    class_index[k], avg_size[k][0], avg_size[k][1], avg_size[k][2], avg_size[k][3])
+        class_index[k], avg_size[k][0], avg_size[k][1], avg_size[k][2], avg_size[k][3])
     prediction_dict[img_id].append(prediction_sent)
 
     if np.isnan(data).any():
@@ -290,11 +297,10 @@ with open("bounding_box_prev.txt", "w") as f:
             print(p)
             f.write(p + "\n")
             if test_list_is_dcm[i]:
-                local_utils.create_gsps_from_bounding_box(ds, p, index+1, img_folder_path)
+                local_utils.create_gsps_from_bounding_box(ds, p, index + 1, img_folder_path)
             pass
         pass
     pass
-
 
 pass
 
@@ -317,5 +323,6 @@ def visualize_prediction_image(p):
     cv2.imshow('image', frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-pass
 
+
+pass
